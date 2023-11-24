@@ -11,6 +11,7 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@ethereumjs/util": "^9.0.1",
     "@evmts/core": "next",
     "@evmts/vm": "next",
     "abitype": "^0.10.2",

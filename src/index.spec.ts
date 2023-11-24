@@ -1,8 +1,10 @@
 import { expect, test } from 'bun:test'
 import { EVMts } from '@evmts/vm'
 
-import { AddNumbers } from './AddScript.s.sol'
+import { AddNumbers } from '@/contracts/AddScript.s.sol'
 import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol'
+import { Fs } from '@evmts/precompiles'
+import { existsSync, rmSync } from 'fs'
 
 test('should run a contract call', async () => {
 	const vm = await EVMts.create({
@@ -33,3 +35,14 @@ test('should run a contract call', async () => {
 	})
 })
 
+test('should be able to write to file system with Fs precompile', async () => {
+	const vm = await EVMts.create({
+		customPrecompiles: [Fs.precompile]
+	})
+	await vm.runContractCall({
+		contractAddress: Fs.address,
+		...Fs.contract.write.writeFile('test.txt', 'hello world')
+	})
+	expect(existsSync('test.txt')).toBe(true)
+	rmSync('test.txt')
+})

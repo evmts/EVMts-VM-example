@@ -1,7 +1,7 @@
 // this contract is deployed to OP mainnet
 // EVMts compiles bytecode to run scripts for .s.sol files that aren't deployed to a chain
 import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol'
-import { AddNumbers } from './AddScript.s.sol'
+import { AddNumbers } from '@/contracts/AddScript.s.sol'
 import { EVMts } from '@evmts/vm'
 
 // Create an instance of the EVM in js that runs in Node or the browser

@@ -12,6 +12,19 @@
       "dom.iterable",
       "esnext"
     ],
+    "paths": {
+      "@/contracts/*": [
+        "./contracts/*"
+      ],
+      // playing around with this being the api
+      // will upstream this to @evmts/precompiles package if it works out
+      "@evmts/precompiles": [
+        "./precompiles/index.ts"
+      ],
+      "@/src/*": [
+        "./src/*"
+      ]
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
