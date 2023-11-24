@@ -7,14 +7,14 @@ import { EVMts } from '@evmts/vm'
 // Create an instance of the EVM in js that runs in Node or the browser
 const vm = await EVMts.create({
 	fork: {
-		url: 'https://mainnet.optimism.io'
+		url: 'https://goerli.optimism.io'
 	}
 })
 
 // runContractCall calls a contract method that is deployed to the forked chain
 await vm.runContractCall({
 	...ERC721.read.balanceOf('0x8f0ebdaa1cf7106be861753b0f9f5c0250fe0819'),
-	contractAddress: "0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2"
+	contractAddress: "0x1df10ec981ac5871240be4a94f250dd238b77901"
 }).then(console.log)
 
 // A script is a contract that is not deployed

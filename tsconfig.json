@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "plugins": [
+      // @evmts/ts-plugin is what provides LSP support in editor for contract imports
       {
         "name": "@evmts/ts-plugin"
       }
