@@ -1,9 +1,8 @@
 import { expect, test } from 'bun:test'
 import { EVMts } from '@evmts/vm'
 
-import { AddNumbers } from '@/contracts/AddScript.s.sol'
 import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol'
-import { Fs } from '@evmts/precompiles'
+import { fsPrecompile } from '@evmts/precompiles'
 import { existsSync, rmSync } from 'fs'
 
 test('should run a contract call', async () => {
@@ -23,26 +22,55 @@ test('should run a contract call', async () => {
 	})
 })
 
-test('should run a contract call', async () => {
-	const vm = await EVMts.create()
-	const sum = await vm.runScript(
-		AddNumbers.read.add(389n, 31n)
-	)
-	expect(sum).toEqual({
-		gasUsed: 927n,
+test('should run a script that is not deployed', async () => {
+	const { AddNumbers } = await import('@/contracts/AddScript.s.sol')
+	const vm = await EVMts.create({
+		fork: {
+			url: 'https://goerli.optimism.io'
+		}
+	})
+	expect(await vm.runScript(AddNumbers.read.add(390n, 30n))).toEqual({
 		data: 420n,
-		logs: [],
+		gasUsed: 927n,
+		logs: []
 	})
 })
 
-test('should be able to write to file system with Fs precompile', async () => {
+test('Call precompile from TypeScript', async () => {
 	const vm = await EVMts.create({
-		customPrecompiles: [Fs.precompile]
+		customPrecompiles: [fsPrecompile.precompile()]
 	})
+
 	await vm.runContractCall({
-		contractAddress: Fs.address,
-		...Fs.contract.write.writeFile('test.txt', 'hello world')
+		contractAddress: fsPrecompile.address,
+		...fsPrecompile.contract.write.writeFile('test.txt', 'hello world')
 	})
+
 	expect(existsSync('test.txt')).toBe(true)
+	expect(
+		(await vm.runContractCall({
+			contractAddress: fsPrecompile.address,
+			...fsPrecompile.contract.read.readFile('test.txt')
+		})).data
+	).toBe('hello world')
+
 	rmSync('test.txt')
 })
+
+test('Call precompile from solidity script', async () => {
+	const { fsPrecompile } = await import("@evmts/precompiles")
+	const { WriteHelloWorld } = await import("@/contracts/WriteHelloWorld.s.sol")
+
+	const vm = await EVMts.create({
+		customPrecompiles: [fsPrecompile.precompile()]
+	})
+
+	await vm.runScript(
+		WriteHelloWorld.write.write(fsPrecompile.address)
+	)
+
+	expect(existsSync('test.txt')).toBe(true)
+
+	rmSync('test.txt')
+})
+

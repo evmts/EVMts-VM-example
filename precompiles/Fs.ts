@@ -1,52 +1,33 @@
-import { Hex, decodeFunctionData, toHex } from 'viem'
+import { decodeFunctionData, encodeFunctionResult, hexToBytes, toBytes, toHex } from 'viem'
 import fs from 'fs/promises'
-import { Address } from '@ethereumjs/util'
-import { evmtsContractFactory } from '@evmts/core'
+import { defineCall, definePrecompile } from './definePrecompile'
 
-export class Fs {
-  public static readonly address = "0xf2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2"
-  private static readonly ethjsAddress = Address.fromString(Fs.address)
+import { Fs } from './Fs.sol'
+import { Abi, AbiParametersToPrimitiveTypes, ExtractAbiFunction, ExtractAbiFunctionNames } from 'abitype'
 
-  // TODO write this is as a solidity interface and import it instead of hardcoding the evmts contract
-  // e.g. this should be `import { Fs } from '@evmts/precompiles/Fs.sol'` 
-  public static readonly contract = evmtsContractFactory({
-    humanReadableAbi: [
-      "function readFile(string path) view returns (string data)",
-      "function writeFile(string path, string data)"
-    ] as const,
-    name: 'Fs',
-    bytecode: undefined,
-    deployedBytecode: undefined,
-  })
+type Handler<TAbi extends Abi, TFunctionName extends ExtractAbiFunctionNames<TAbi>> = ((params: {
+  gasLimit: bigint
+  args: AbiParametersToPrimitiveTypes<
+    ExtractAbiFunction<TAbi, TFunctionName>['inputs']
+  >
+}) => Promise<{
+  executionGasUsed: bigint,
+  returnValue: AbiParametersToPrimitiveTypes<ExtractAbiFunction<TAbi, TFunctionName>['outputs']>[0],
+  // TODO expose the ability to emit logs from precompiles
+  // logs: ExtractEvetLogs<TAbi, TFunctionName>
+}>)
 
-  public static readonly precompile = {
-    address: Fs.ethjsAddress,
-    function: async ({ data }: { data: Uint8Array }) => {
-      return ({ returnValue: await Fs.call(toHex(data)), executionGasUsed: 0n })
+export const fsPrecompile = definePrecompile({
+  contract: Fs,
+  address: "0xf2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2",
+  call: defineCall(Fs.abi, {
+    readFile: async ({ args }) => {
+      return { returnValue: await fs.readFile(...args, 'utf8'), executionGasUsed: 0n }
     },
-  }
-
-  private static readonly call = async (data: Hex) => {
-    const d = decodeFunctionData({
-      abi: Fs.contract.abi,
-      data: data,
-    })
-    if (d.functionName === 'readFile') {
-      return Fs[d.functionName](...d.args)
-    } else if (d.functionName === 'writeFile') {
-      return Fs.writeFile(...d.args)
-    } else {
-      d satisfies never
-      throw new Error('invalid function name')
+    writeFile: async ({ args }) => {
+      await fs.writeFile(...args)
+      return { returnValue: true, executionGasUsed: 0n }
     }
-  }
-
-  private static readonly readFile = (path: string) => {
-    return fs.readFile(path, 'utf8')
-  }
-
-  private static writeFile = (path: string, data: string) => {
-    return fs.writeFile(path, data, 'utf8')
-  }
-}
+  })
+})
 
