@@ -1,5 +1,5 @@
 {
-  "name": "@evmts/example-bun",
+  "name": "@tevm/example-bun",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,15 +11,17 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@eth-optimism/contracts-ts": "^0.17.0",
+    "@eth-optimism/sdk": "^3.1.6",
     "@ethereumjs/util": "^9.0.1",
-    "@evmts/core": "next",
-    "@evmts/vm": "next",
+    "tevm": "next",
     "abitype": "^0.10.2",
+    "ethers": "5",
+    "op-viem": "^1.1.1",
     "viem": "^1.19.9"
   },
   "devDependencies": {
-    "@evmts/bun-plugin": "next",
-    "@evmts/ts-plugin": "next",
+    "@tevm/bundler": "next",
     "@openzeppelin/contracts": "^5.0.0",
     "@types/live-server": "^1.2.3",
     "@types/node": "^20.10.0",

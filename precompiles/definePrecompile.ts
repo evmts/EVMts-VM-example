@@ -1,5 +1,5 @@
 import { Address } from '@ethereumjs/util'
-import { type EvmtsContract } from '@evmts/core'
+import { type Script } from 'tevm'
 import { decodeFunctionData, encodeFunctionResult, hexToBytes, toHex, type Hex } from 'viem'
 import { Abi, AbiParametersToPrimitiveTypes, ExtractAbiFunction, ExtractAbiFunctionNames } from 'abitype'
 
@@ -47,7 +47,7 @@ export const defineCall = <TAbi extends Abi>(
 }
 
 export abstract class Precompile<TName extends string, THumanReadableAbi extends readonly string[], TBytecode extends `0x${string}` | undefined, TDeployedBytecode extends `0x${string}` | undefined>{
-  public abstract readonly contract: EvmtsContract<TName, THumanReadableAbi, TBytecode, TDeployedBytecode>
+  public abstract readonly contract: Script<TName, THumanReadableAbi, TBytecode, TDeployedBytecode>
   public abstract readonly address: `0x${string}`
   protected readonly ethjsAddress = () => Address.fromString(this.address)
   public readonly precompile = () => ({
