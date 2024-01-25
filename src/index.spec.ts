@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test'
-import { EVMts } from '@evmts/vm'
+import { createMemoryClient } from 'tevm'
 
 import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol'
 import { fsPrecompile } from '@evmts/precompiles'
 import { existsSync, rmSync } from 'fs'
 
 test('should run a contract call', async () => {
-	const vm = await EVMts.create({
+	const vm = await createMemoryClient({
 		fork: {
 			url: 'https://goerli.optimism.io'
 		}
@@ -24,7 +24,9 @@ test('should run a contract call', async () => {
 
 test('should run a script that is not deployed', async () => {
 	const { AddNumbers } = await import('@/contracts/AddScript.s.sol')
-	const vm = await EVMts.create({
+	console.log(AddNumbers.deployedBytecode)
+	console.log(AddNumbers.bytecode)
+	const vm = await createMemoryClient({
 		fork: {
 			url: 'https://goerli.optimism.io'
 		}
@@ -37,7 +39,7 @@ test('should run a script that is not deployed', async () => {
 })
 
 test('Call precompile from TypeScript', async () => {
-	const vm = await EVMts.create({
+	const vm = await createMemoryClient({
 		customPrecompiles: [fsPrecompile.precompile()]
 	})
 
@@ -61,7 +63,7 @@ test('Call precompile from solidity script', async () => {
 	const { fsPrecompile } = await import("@evmts/precompiles")
 	const { WriteHelloWorld } = await import("@/contracts/WriteHelloWorld.s.sol")
 
-	const vm = await EVMts.create({
+	const vm = await createMemoryClient({
 		customPrecompiles: [fsPrecompile.precompile()]
 	})
 

@@ -1,4 +1,4 @@
-import { evmtsBunPlugin } from '@evmts/bun-plugin'
+import { bunPluginTevm } from '@tevm/bundler/bun-plugin'
 import { plugin } from 'bun'
 
-plugin(evmtsBunPlugin({}))
+plugin(bunPluginTevm({}))

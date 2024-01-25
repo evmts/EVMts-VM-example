@@ -1,4 +1,3 @@
-import { decodeFunctionData, encodeFunctionResult, hexToBytes, toBytes, toHex } from 'viem'
 import fs from 'fs/promises'
 import { defineCall, definePrecompile } from './definePrecompile'
 
